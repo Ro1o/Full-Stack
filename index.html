@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <title>Pet Store</title>
+</head>
+<body>
+<div id="webstore">
+
+    <!-- Cart icon top right (display only, not clickable) -->
+    <div v-if="!onCheckout" style="float:right; margin:10px;">
+        <i class="fa-solid fa-cart-shopping"></i> ({{ cart.length }})
+    </div>
+
+    <!-- Store Page -->
+    <div v-if="!onCheckout">
+        <h1>{{ message }}</h1>
+
+        <main>
+            <figure>
+                <img v-bind:src="product.image" alt="Product image">
+                <h2 v-text="product.title"></h2>
+                <p>ID: {{ product.id }}</p>
+                <p v-text="product.description"></p>
+                <p>Price: ${{ product.price }}</p>
+                <p>Available: {{ product.quantity }}</p>
+                <button v-on:click="addToCart(product)" :disabled="product.quantity === 0">
+                    Add to Cart
+                </button>
+                <p v-if="product.quantity === 0" style="color:red;">Out of stock</p>
+            </figure>
+        </main>
+
+        <!-- Cart Section -->
+        <section>
+            <h2>Cart</h2>
+            <p>Items in cart: {{ cart.length }}</p>
+            <ul>
+                <li v-for="(item, index) in cart" :key="index">
+                    {{ item.title }} - ${{ item.price }}
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    <!-- Checkout Page -->
+    <div v-if="onCheckout">
+        <h1>Welcome to Checkout</h1>
+        <p>You have {{ cart.length }} item(s) in your cart.</p>
+        <button @click="backToStore">
+            <i class="fa-solid fa-store"></i> Back to Store
+        </button>
+    </div>
+
+</div>
+
+<script>
+let webstore = new Vue({
+    el: '#webstore',
+    data: {
+        message: 'Welcome to my Pet Store !!!!',
+        product: {
+            id: 1001,
+            title: 'Cat Food 25 lb bag',
+            description: 'Irresistible cat food for your cat',
+            price: 20,
+            image: 'catimage.jpg',
+            quantity: 5
+        },
+        cart: [],
+        onCheckout: false,
+        autoCheckoutLimit: 5 // number of items before auto checkout
+    },
+    methods: {
+        addToCart(product) {
+            if (product.quantity > 0) {
+                this.cart.push(product);
+                product.quantity--;
+                // auto go to checkout when limit reached
+                if (this.cart.length === this.autoCheckoutLimit) {
+                    this.onCheckout = true;
+                }
+            }
+        },
+        backToStore() {
+            this.onCheckout = false;
+        }
+    }
+});
+</script>
+</body>
+</html>
